@@ -1,0 +1,5 @@
+email,password,name,phone,address,emergencyContactName,emergencyContactPhone,status
+careworker2@example.com,password123,Jane Smith,+44 7700 900456,456 Oak Avenue Manchester UK,John Smith,+44 7700 900457,active
+careworker3@example.com,password123,Mike Johnson,+44 7700 900789,789 Elm Road Birmingham UK,Sarah Johnson,+44 7700 900790,active
+careworker4@example.com,password123,Emily Davis,+44 7700 901012,321 Pine Street Leeds UK,David Davis,+44 7700 901013,active
+

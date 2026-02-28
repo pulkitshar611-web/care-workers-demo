@@ -1,0 +1,1095 @@
+{
+	"info": {
+		"_postman_id": "care-worker-api-complete",
+		"name": "Kiaan Technology API Collection",
+		"description": "Complete API collection with all endpoints for Kiaan Technology Management System\n\n📋 **Setup Instructions:**\n1. Import this collection\n2. Run 'Admin Login' to get admin token\n3. Run 'Kiaan Technology Login' to get Kiaan Technology token\n4. Tokens are automatically saved to variables\n\n🔐 **Default Credentials:**\n- Admin: info@kiaantechnology.com / password\n- Kiaan Technology: careworker1@example.com / password123\n\n📋 **New Form Endpoints:**\n- GET /api/forms/templates - Get template forms (Admin → Forms / Templates)\n- GET /api/forms/clients - Get client forms (Admin → Clients)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "care-worker-backend"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5000/api",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "careWorkerToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "careWorkerId",
+			"value": "2",
+			"type": "string"
+		},
+		{
+			"key": "formTemplateId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "assignmentId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "signatureId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "payrollId",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "🔐 Authentication",
+			"item": [
+				{
+					"name": "Admin Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.success && response.data.token) {",
+									"        pm.collectionVariables.set('adminToken', response.data.token);",
+									"        pm.collectionVariables.set('authToken', response.data.token);",
+									"        console.log('Admin token saved:', response.data.token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"info@kiaantechnology.com\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Login as Admin user\n\n**Credentials:**\n- Email: info@kiaantechnology.com\n- Password: password\n\n**Response:** Returns JWT token (automatically saved to adminToken variable)"
+					},
+					"response": []
+				},
+				{
+					"name": "Kiaan Technology Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.success && response.data.token) {",
+									"        pm.collectionVariables.set('careWorkerToken', response.data.token);",
+									"        pm.collectionVariables.set('authToken', response.data.token);",
+									"        console.log('Kiaan Technology token saved:', response.data.token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"careworker1@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Login as Kiaan Technology\n\n**Credentials:**\n- Email: careworker1@example.com\n- Password: password123\n\n**Response:** Returns JWT token (automatically saved to careWorkerToken variable)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User (Me)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "me"]
+						},
+						"description": "Get current authenticated user information\n\n**Auth Required:** Yes (Bearer token)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "👤 Admin APIs",
+			"item": [
+				{
+					"name": "Get Admin Dashboard",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/dashboard",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "dashboard"]
+						},
+						"description": "Get admin dashboard summary with KPIs:\n- Total Carers\n- Pending Forms\n- Completed Packs\n- Pending Signatures\n- Recent Carers list\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "👥 Kiaan Technology Management (Admin Only)",
+			"item": [
+				{
+					"name": "Get All Kiaan Technologys",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/care-workers?search=&status=All&progress=All",
+							"host": ["{{baseUrl}}"],
+							"path": ["care-workers"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by name, email, or phone",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "All",
+									"description": "Filter by status: All, Active, Inactive, Pending"
+								},
+								{
+									"key": "progress",
+									"value": "All",
+									"description": "Filter by progress: All, 0-25, 26-50, 51-75, 76-100"
+								}
+							]
+						},
+						"description": "Get all Kiaan Technologys with filters\n\n**Query Parameters:**\n- `search` - Search by name, email, or phone\n- `status` - Filter by status (All, Active, Inactive, Pending)\n- `progress` - Filter by progress range\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Kiaan Technology by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/care-workers/{{careWorkerId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["care-workers", "{{careWorkerId}}"]
+						},
+						"description": "Get detailed information about a specific Kiaan Technology\n\n**Path Parameters:**\n- `id` - Kiaan Technology ID\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Kiaan Technology",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"newcareworker@example.com\",\n    \"password\": \"password123\",\n    \"name\": \"New Kiaan Technology\",\n    \"phone\": \"1234567890\",\n    \"address\": \"123 Main Street, City, Country\",\n    \"emergencyContactName\": \"Emergency Contact Name\",\n    \"emergencyContactPhone\": \"0987654321\",\n    \"status\": \"active\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/care-workers",
+							"host": ["{{baseUrl}}"],
+							"path": ["care-workers"]
+						},
+						"description": "Create a new Kiaan Technology account\n\n**Required Fields:**\n- `email` - Kiaan Technology email\n- `password` - Kiaan Technology password\n- `name` - Kiaan Technology full name\n\n**Optional Fields:**\n- `phone` - Phone number\n- `address` - Address\n- `emergencyContactName` - Emergency contact name\n- `emergencyContactPhone` - Emergency contact phone\n- `status` - Status (active, inactive, pending)\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Kiaan Technology",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Name\",\n    \"phone\": \"9999999999\",\n    \"address\": \"Updated Address\",\n    \"emergencyContactName\": \"Updated Emergency Contact\",\n    \"emergencyContactPhone\": \"8888888888\",\n    \"status\": \"active\",\n    \"password\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/care-workers/{{careWorkerId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["care-workers", "{{careWorkerId}}"]
+						},
+						"description": "Update Kiaan Technology information\n\n**Path Parameters:**\n- `id` - Kiaan Technology ID\n\n**Body:** All fields are optional\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Kiaan Technology",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/care-workers/{{careWorkerId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["care-workers", "{{careWorkerId}}"]
+						},
+						"description": "Delete Kiaan Technology (soft delete - sets status to inactive)\n\n**Path Parameters:**\n- `id` - Kiaan Technology ID\n\n**Note:** This is a soft delete. The Kiaan Technology status will be set to 'inactive'.\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📋 Form Templates",
+			"item": [
+				{
+					"name": "Get Template Forms",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/forms/templates?search=&type=",
+							"host": ["{{baseUrl}}"],
+							"path": ["forms", "templates"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by name or description",
+									"disabled": true
+								},
+								{
+									"key": "type",
+									"value": "",
+									"description": "Filter by type: Input or Document",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get all template forms (Admin → Forms / Templates)\n\n**Query Parameters:**\n- `search` - Search by name or description\n- `type` - Filter by type (Input, Document)\n\n**Returns:** ~30 template forms\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Client Forms",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/forms/clients?search=&type=",
+							"host": ["{{baseUrl}}"],
+							"path": ["forms", "clients"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by name or description",
+									"disabled": true
+								},
+								{
+									"key": "type",
+									"value": "",
+									"description": "Filter by type: Input or Document",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get all client forms (Admin → Clients)\n\n**Query Parameters:**\n- `search` - Search by name or description\n- `type` - Filter by type (Input, Document)\n\n**Returns:** ~4 client forms (Telephone Monitoring, Care Plan, Risk Management, Incident Form)\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Forms (Backward Compatible)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/forms?search=&type=",
+							"host": ["{{baseUrl}}"],
+							"path": ["forms"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by name or description",
+									"disabled": true
+								},
+								{
+									"key": "type",
+									"value": "",
+									"description": "Filter by type: Input or Document",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get all form templates (backward compatibility - returns template forms only)\n\n**Query Parameters:**\n- `search` - Search by name or description\n- `type` - Filter by type (Input, Document)\n\n**Note:** Use `/forms/templates` or `/forms/clients` for specific form types\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Form by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/forms/{{formTemplateId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["forms", "{{formTemplateId}}"]
+						},
+						"description": "Get form template by ID\n\n**Path Parameters:**\n- `id` - Form Template ID\n\n**Auth Required:** Yes (any authenticated user)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Form Template",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"New Form Template\",\n    \"description\": \"Form description here\",\n    \"type\": \"Input\",\n    \"version\": \"1.0\",\n    \"formData\": {\n        \"fields\": []\n    },\n    \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/forms",
+							"host": ["{{baseUrl}}"],
+							"path": ["forms"]
+						},
+						"description": "Create a new form template\n\n**Required Fields:**\n- `name` - Form template name\n\n**Optional Fields:**\n- `description` - Form description\n- `type` - Form type (Input, Document) - Default: Input\n- `version` - Version number - Default: 1.0\n- `formData` - JSON form structure\n- `isActive` - Active status - Default: true\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Form Template",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Form Name\",\n    \"description\": \"Updated description\",\n    \"version\": \"1.1\",\n    \"type\": \"Input\",\n    \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/forms/{{formTemplateId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["forms", "{{formTemplateId}}"]
+						},
+						"description": "Update form template\n\n**Path Parameters:**\n- `id` - Form Template ID\n\n**Body:** All fields are optional\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Form Template",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/forms/{{formTemplateId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["forms", "{{formTemplateId}}"]
+						},
+						"description": "Delete form template\n\n**Path Parameters:**\n- `id` - Form Template ID\n\n**Note:** If form has existing assignments, it will be deactivated instead of deleted.\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📝 Form Assignments",
+			"item": [
+				{
+					"name": "Assign Forms to Kiaan Technology",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"careWorkerId\": 2,\n    \"formTemplateIds\": [1, 2, 3],\n    \"dueDate\": \"2024-12-31\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/form-assignments",
+							"host": ["{{baseUrl}}"],
+							"path": ["form-assignments"]
+						},
+						"description": "Assign one or multiple forms to a Kiaan Technology\n\n**Required Fields:**\n- `careWorkerId` - Kiaan Technology ID\n- `formTemplateIds` - Array of Form Template IDs\n\n**Optional Fields:**\n- `dueDate` - Due date (YYYY-MM-DD format)\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Kiaan Technology Assignments",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/form-assignments/care-worker/{{careWorkerId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["form-assignments", "care-worker", "{{careWorkerId}}"]
+						},
+						"description": "Get all form assignments for a specific Kiaan Technology\n\n**Path Parameters:**\n- `id` - Kiaan Technology ID\n\n**Note:** Kiaan Technologys can only view their own assignments. Admins can view any Kiaan Technology's assignments.\n\n**Auth Required:** Yes (Admin or own assignments)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Form Assignment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{careWorkerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"in_progress\",\n    \"progress\": 50,\n    \"formData\": {\n        \"field1\": \"value1\",\n        \"field2\": \"value2\",\n        \"field3\": \"value3\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/form-assignments/{{assignmentId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["form-assignments", "{{assignmentId}}"]
+						},
+						"description": "Update form assignment (start/resume/submit form)\n\n**Path Parameters:**\n- `id` - Form Assignment ID\n\n**Body Fields:**\n- `status` - Status: assigned, in_progress, submitted, signature_pending, completed\n- `progress` - Progress percentage (0-100)\n- `formData` - Form data as JSON object\n\n**Status Flow:**\n- assigned → in_progress → submitted → signature_pending → completed\n\n**Auth Required:** Kiaan Technology (own assignments) or Admin"
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Form (Change Status to Submitted)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{careWorkerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"submitted\",\n    \"progress\": 100,\n    \"formData\": {\n        \"allFields\": \"filled\",\n        \"completed\": true\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/form-assignments/{{assignmentId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["form-assignments", "{{assignmentId}}"]
+						},
+						"description": "Submit a completed form (changes status to 'submitted' or 'signature_pending')\n\n**Note:** After submission, form may require signature depending on form type.\n\n**Auth Required:** Kiaan Technology (own assignments)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "✍️ Signatures",
+			"item": [
+				{
+					"name": "Get Pending Signatures",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{careWorkerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/signatures/pending",
+							"host": ["{{baseUrl}}"],
+							"path": ["signatures", "pending"]
+						},
+						"description": "Get all forms pending signature\n\n**Note:** Kiaan Technologys see only their own pending signatures. Admins see all pending signatures.\n\n**Auth Required:** Yes (Kiaan Technology or Admin)"
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Signature (Draw Type)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{careWorkerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"assignmentId\": 2,\n    \"signatureData\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\",\n    \"signatureType\": \"draw\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/signatures",
+							"host": ["{{baseUrl}}"],
+							"path": ["signatures"]
+						},
+						"description": "Submit a drawn signature\n\n**Required Fields:**\n- `assignmentId` - Form Assignment ID\n- `signatureData` - Base64 encoded signature image\n- `signatureType` - \"draw\" for drawn signature\n\n**Note:** After signature submission, form status changes to 'completed'.\n\n**Auth Required:** Kiaan Technology (own assignments) or Admin"
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Signature (Type/Text)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{careWorkerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"assignmentId\": 2,\n    \"signatureData\": \"John Doe\",\n    \"signatureType\": \"type\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/signatures",
+							"host": ["{{baseUrl}}"],
+							"path": ["signatures"]
+						},
+						"description": "Submit a typed/text signature\n\n**Required Fields:**\n- `assignmentId` - Form Assignment ID\n- `signatureData` - Signature text (full name)\n- `signatureType` - \"type\" for typed signature\n\n**Auth Required:** Kiaan Technology (own assignments) or Admin"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🏠 Kiaan Technology Dashboard",
+			"item": [
+				{
+					"name": "Get Kiaan Technology Dashboard",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{careWorkerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/care-worker/dashboard",
+							"host": ["{{baseUrl}}"],
+							"path": ["care-worker", "dashboard"]
+						},
+						"description": "Get Kiaan Technology dashboard with:\n- Summary cards (Forms Completed, Forms Pending, Signatures Needed, Profile Status)\n- Notifications list\n- Assigned forms list with status and progress\n\n**Auth Required:** Kiaan Technology only"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📥📤 Import/Export (Admin Only)",
+			"item": [
+				{
+					"name": "Export Kiaan Technologys to CSV",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/import-export/export-care-workers",
+							"host": ["{{baseUrl}}"],
+							"path": ["import-export", "export-care-workers"]
+						},
+						"description": "Export all Kiaan Technologys to CSV file\n\n**Response:** CSV file download\n\n**CSV Columns:**\n- ID, Email, Name, Phone, Address, Emergency Contact Name, Emergency Contact Phone, Status, Created At\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				},
+				{
+					"name": "Import Kiaan Technologys from CSV",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": [],
+									"description": "CSV file with Kiaan Technology data"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/import-export/import-care-workers",
+							"host": ["{{baseUrl}}"],
+							"path": ["import-export", "import-care-workers"]
+						},
+						"description": "Import Kiaan Technologys from CSV file\n\n**CSV Format Required:**\n- Columns: email, password, name, phone, address, emergencyContactName, emergencyContactPhone, status\n- Required: email, password, name\n- Optional: phone, address, emergencyContactName, emergencyContactPhone, status\n\n**File Size Limit:** 5MB\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "💰 Payroll Management (Admin Only)",
+			"item": [
+				{
+					"name": "Get All Payroll Records",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/payroll?search=&region=&status=",
+							"host": ["{{baseUrl}}"],
+							"path": ["payroll"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by name, email, or Kiaan Technology name",
+									"disabled": true
+								},
+								{
+									"key": "region",
+									"value": "",
+									"description": "Filter by region (e.g., Acton 1, Acton 2, Ealing 1)",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "",
+									"description": "Filter by status: Paid, Unpaid",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get all payroll records with optional filters\n\n**Query Parameters:**\n- `search` - Search by name, email, or Kiaan Technology name\n- `region` - Filter by region\n- `status` - Filter by status (Paid, Unpaid)\n\n**Response:** Array of payroll records with Kiaan Technology details\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payroll Record by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/payroll/{{payrollId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["payroll", "{{payrollId}}"]
+						},
+						"description": "Get a specific payroll record by ID\n\n**Path Parameters:**\n- `id` - Payroll Record ID\n\n**Response:** Payroll record with Kiaan Technology details\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Payroll Record",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"careWorkerId\": 2,\n    \"region\": \"Acton 1\",\n    \"name\": \"John Doe\",\n    \"clientNo\": \"CL001\",\n    \"date\": \"Oct\",\n    \"totalHours\": 40,\n    \"ratePerHour\": 15.50,\n    \"totalAmount\": 620.00,\n    \"paid\": 500.00,\n    \"status\": \"Unpaid\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/payroll",
+							"host": ["{{baseUrl}}"],
+							"path": ["payroll"]
+						},
+						"description": "Create a new payroll record\n\n**Required Fields:**\n- `careWorkerId` - Kiaan Technology ID\n- `name` - Kiaan Technology name\n\n**Optional Fields:**\n- `region` - Region name\n- `clientNo` - Client number\n- `date` - Date/period (e.g., \"Oct\")\n- `totalHours` - Total hours worked\n- `ratePerHour` - Rate per hour\n- `totalAmount` - Total amount (calculated if not provided: totalHours * ratePerHour)\n- `paid` - Amount paid\n- `status` - Status (Paid, Unpaid) - Default: Unpaid\n\n**Note:** Balance is automatically calculated as (totalAmount - paid)\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Payroll Record",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"region\": \"Acton 2\",\n    \"name\": \"John Doe Updated\",\n    \"clientNo\": \"CL002\",\n    \"date\": \"Nov\",\n    \"totalHours\": 45,\n    \"ratePerHour\": 16.00,\n    \"totalAmount\": 720.00,\n    \"paid\": 720.00,\n    \"status\": \"Paid\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/payroll/{{payrollId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["payroll", "{{payrollId}}"]
+						},
+						"description": "Update a payroll record\n\n**Path Parameters:**\n- `id` - Payroll Record ID\n\n**Body:** All fields are optional. Only provided fields will be updated.\n\n**Note:** Balance is automatically recalculated based on totalAmount and paid values.\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Payroll Record",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/payroll/{{payrollId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["payroll", "{{payrollId}}"]
+						},
+						"description": "Delete a payroll record\n\n**Path Parameters:**\n- `id` - Payroll Record ID\n\n**Note:** This is a hard delete - the record will be permanently removed from the database.\n\n**Auth Required:** Admin only"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🏥 Health Check",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/health",
+					"host": ["{{baseUrl}}"],
+					"path": ["health"]
+				},
+				"description": "Health check endpoint - No authentication required\n\n**Response:** Server status and timestamp"
+			},
+			"response": []
+		}
+	]
+}
+
